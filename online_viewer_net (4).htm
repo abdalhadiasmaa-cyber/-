@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق وصفات حلويات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .rtl\:space-x-reverse > * + * {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <div id="app"></div>
+
+    <script>
+        // بيانات الوصفات الثابتة
+        const recipesData = [
+            { id: 1, name: 'كنافة', price: 15, prepTime: '45 دقيقة', ingredients: ['كنافة شعر', 'جبنة عكاوي', 'سمنة', 'قطر', 'فستق حلبي'], instructions: ['نذوب السمنة ونسكبها على الكنافة.', 'نضع نصف كمية الكنافة في الصينية ونضغطها.', 'نوزع الجبنة على الكنافة.', 'نغطيها بالنصف الثاني من الكنافة ونضغطها.', 'نخبزها حتى تحمر ثم نقلبها.', 'نسقيها بالقطر ونزينها بالفستق.'] },
+            { id: 2, name: 'تشيز كيك', price: 20, prepTime: 'ساعة ونصف', ingredients: ['بسكويت دايجستف', 'زبدة', 'جبنة كريمية', 'سكر', 'كريمة حامضة', 'فانيلا'], instructions: ['نطحن البسكويت ونخلطه مع الزبدة.', 'نضغط الخليط في قالب التشيز كيك.', 'نخلط الجبنة، السكر، الكريمة والفانيلا.', 'نسكب الخليط فوق البسكويت ونخبزه.', 'نتركه يبرد في الثلاجة لعدة ساعات.'] },
+            { id: 3, name: 'براونيز', price: 10, prepTime: '40 دقيقة', ingredients: ['شوكولاتة داكنة', 'زبدة', 'بيض', 'سكر بني', 'طحين', 'كاكاو بودرة', 'ملح'], instructions: ['نذوب الشوكولاتة والزبدة معاً.', 'نخفق البيض والسكر حتى يصبح الخليط فاتحاً.', 'نضيف خليط الشوكولاتة والزبدة.', 'ننخل الطحين والكاكاو والملح ونضيفهم.', 'نسكب الخليط في قالب ونخبزه.', 'نتركه يبرد تماماً قبل التقطيع.'] },
+            { id: 4, name: 'معمول', price: 18, prepTime: 'ساعة', ingredients: ['سميد', 'سمنة', 'سكر بودرة', 'ماء الورد', 'تمر معجون'], instructions: ['نخلط السميد مع السمنة ونتركه ليلة كاملة.', 'نضيف السكر وماء الورد ونعجن.', 'نحشي العجينة بالتمر ونشكلها.', 'نخبزها حتى تحمر قليلاً.'] },
+            { id: 5, name: 'أم علي', price: 8, prepTime: '30 دقيقة', ingredients: ['عجينة باف باستري', 'حليب', 'كريمة', 'سكر', 'مكسرات', 'جوز هند'], instructions: ['نخبز عجينة الباف باستري حتى تصبح ذهبية.', 'نخلط الحليب والكريمة والسكر على النار.', 'نكسر الباف باستري في طبق التقديم.', 'نسكب خليط الحليب فوقها ونرش المكسرات.', 'نخبزها قليلاً حتى تحمر الأطراف.'] },
+            { id: 6, name: 'بسبوسة', price: 12, prepTime: '45 دقيقة', ingredients: ['سميد', 'لبن زبادي', 'سكر', 'زيت', 'بيكنج بودر', 'قطر'], instructions: ['نخلط المكونات الجافة معاً.', 'نضيف اللبن والزيت ونخلط حتى تتجانس.', 'نسكب الخليط في صينية ونخبزه.', 'نسقيها بالقطر فور خروجها من الفرن.'] },
+            { id: 7, name: 'قطايف', price: 14, prepTime: 'ساعة', ingredients: ['طحين', 'سميد ناعم', 'حليب بودرة', 'ماء', 'سكر', 'خميرة فورية', 'جبنة أو جوز'], instructions: ['نخلط المكونات الجافة ثم نضيف الماء تدريجياً.', 'نترك العجينة لتتخمر.', 'نصب العجينة على شكل أقراص صغيرة على صاج ساخن.', 'نحشي القطايف بالجبنة أو الجوز ونغلقها.', 'نقليها في الزيت حتى تصبح ذهبية ونسقيها بالقطر.'] },
+            { id: 8, name: 'مهلبية', price: 7, prepTime: '20 دقيقة', ingredients: ['حليب', 'نشا الذرة', 'سكر', 'ماء ورد'], instructions: ['نخلط جميع المكونات على البارد ثم نضعها على النار.', 'نستمر في التحريك حتى يثخن الخليط.', 'نسكبه في أطباق التقديم ونتركه يبرد.', 'نزينه بالمكسرات قبل التقديم.'] },
+            { id: 9, name: 'حلاوة الجبن', price: 22, prepTime: '40 دقيقة', ingredients: ['جبنة حلوة', 'سميد ناعم', 'سكر', 'ماء الزهر', 'قشطة'], instructions: ['نذوب الجبنة مع السكر وماء الزهر على النار.', 'نضيف السميد ونخلط بسرعة حتى تصبح عجينة.', 'نمد العجينة على ورق زبدة ونحشيها بالقشطة.', 'نلفها على شكل أسطوانة ونقطعها.'] },
+            { id: 10, name: 'ليزي كيك', price: 10, prepTime: '30 دقيقة', ingredients: ['بسكويت سادة', 'زبدة', 'كاكاو', 'سكر', 'حليب', 'شوكولاتة'], instructions: ['نخلط الكاكاو والسكر والزبدة والحليب على النار.', 'نضيف الشوكولاتة ونذيبها.', 'نكسر البسكويت ونضيفه للخليط.', 'نشكل الخليط في قالب ونبرده في الثلاجة.'] },
+            { id: 11, name: 'كيكة الشوكولاتة', price: 14, prepTime: '50 دقيقة', ingredients: ['طحين', 'كاكاو', 'بيكنج بودر', 'بيض', 'حليب', 'زيت', 'سكر'], instructions: ['نخلط المكونات الجافة.', 'نضيف المكونات السائلة ونخلط.', 'نسكب الخليط في قالب ونخبزه.', 'نزينه بصوص الشوكولاتة.'] },
+            { id: 12, name: 'كيكة الفانيلا', price: 13, prepTime: '45 دقيقة', ingredients: ['طحين', 'بيكنج بودر', 'بيض', 'حليب', 'زيت', 'سكر', 'فانيلا'], instructions: ['نخفق البيض والفانيلا والسكر.', 'نضيف الزيت والحليب.', 'نخلط المكونات الجافة ونضيفها بالتدريج.', 'نخبزها في قالب مدهون.'] },
+            { id: 13, name: 'بان كيك', price: 9, prepTime: '20 دقيقة', ingredients: ['طحين', 'بيكنج بودر', 'ملح', 'حليب', 'بيض', 'زبدة مذابة'], instructions: ['نخلط المكونات الجافة.', 'نضيف المكونات السائلة ونخلط حتى تتجانس.', 'نسكب مقدار مغرفة على مقلاة ساخنة.', 'نقلبها حتى تحمر من الجهتين.'] },
+            { id: 14, name: 'لقيمات', price: 11, prepTime: '40 دقيقة', ingredients: ['طحين', 'نشا', 'خميرة', 'سكر', 'حليب بودرة', 'ماء دافئ', 'قطر'], instructions: ['نخلط جميع المكونات ما عدا القطر.', 'نترك العجينة لتتخمر.', 'نقلي اللقيمات في الزيت حتى تصبح ذهبية.', 'نسقيها بالقطر فور خروجها من الزيت.'] },
+            { id: 15, name: 'بقلاوة', price: 25, prepTime: 'ساعة و15 دقيقة', ingredients: ['عجينة بقلاوة', 'فستق مطحون', 'سمنة', 'قطر'], instructions: ['ندهن الصينية بالسمنة.', 'نضع طبقات من عجينة البقلاوة مع دهن كل طبقة بالسمنة.', 'نوزع الفستق ثم نضع باقي الطبقات.', 'نقطعها ونخبزها حتى تحمر.', 'نسقيها بالقطر البارد.'] },
+            { id: 16, name: 'كيكة الجزر', price: 16, prepTime: '55 دقيقة', ingredients: ['جزر مبشور', 'طحين', 'زيت', 'سكر', 'بيض', 'قرفة', 'بيكنج بودر', 'جوز'], instructions: ['نخفق البيض والسكر ثم نضيف الزيت.', 'نضيف الجزر والمكونات الجافة.', 'نسكب الخليط في قالب ونخبزه.'] },
+            { id: 17, name: 'بسكويت الشوكولاتة', price: 10, prepTime: '30 دقيقة', ingredients: ['زبدة', 'سكر بني', 'بيض', 'فانيلا', 'طحين', 'بيكنج بودر', 'رقائق شوكولاتة'], instructions: ['نخلط الزبدة والسكر حتى تصبح كريمية.', 'نضيف البيض والفانيلا.', 'نضيف المكونات الجافة ورقائق الشوكولاتة.', 'نشكل البسكويت ونخبزه.'] },
+            { id: 18, name: 'كوكيز الشوفان', price: 10, prepTime: '35 دقيقة', ingredients: ['زبدة', 'سكر', 'بيض', 'فانيلا', 'طحين', 'شوفان', 'زبيب'], instructions: ['نخلط الزبدة والسكر.', 'نضيف البيض والفانيلا.', 'نخلط المكونات الجافة ونضيفها للخليط.', 'نشكل الكوكيز ونخبزها.'] },
+            { id: 19, name: 'مفن التوت', price: 11, prepTime: '40 دقيقة', ingredients: ['طحين', 'بيكنج بودر', 'سكر', 'ملح', 'بيض', 'حليب', 'زيت', 'توت'], instructions: ['نخلط المكونات الجافة.', 'نخلط المكونات السائلة.', 'نجمع الخليطين معاً.', 'نضيف التوت ونخبزه في قوالب المفن.'] },
+            { id: 20, name: 'حلوى الجيلاتين', price: 5, prepTime: '3 ساعات', ingredients: ['مسحوق الجيلاتين', 'ماء ساخن', 'ماء بارد'], instructions: ['نذوب الجيلاتين في الماء الساخن.', 'نضيف الماء البارد.', 'نسكب الخليط في قوالب ونبرده في الثلاجة.'] },
+            { id: 21, name: 'كيكة البرتقال', price: 13, prepTime: '50 دقيقة', ingredients: ['طحين', 'عصير برتقال', 'زيت', 'سكر', 'بيض', 'بيكنج بودر'], instructions: ['نخفق البيض والسكر.', 'نضيف الزيت وعصير البرتقال.', 'نضيف المكونات الجافة ونخبزها.'] },
+            { id: 22, name: 'تارت الليمون', price: 16, prepTime: 'ساعة', ingredients: ['عجينة تارت جاهزة', 'عصير ليمون', 'بيض', 'سكر', 'زبدة'], instructions: ['نخبز عجينة التارت.', 'نخلط المكونات الأخرى ونصنع حشوة الليمون.', 'نسكب الحشوة في التارت ونخبزها مجدداً.'] },
+            { id: 23, name: 'كيكة التمر', price: 14, prepTime: '50 دقيقة', ingredients: ['تمر منزوع النوى', 'ماء ساخن', 'طحين', 'بيكنج بودر', 'بيض', 'زيت', 'سكر'], instructions: ['ننقع التمر بالماء الساخن.', 'نخفق البيض والسكر والزيت.', 'نضيف خليط التمر والمكونات الجافة.', 'نخبزها في قالب مدهون.'] },
+            { id: 24, name: 'دونات', price: 12, prepTime: 'ساعة ونصف', ingredients: ['طحين', 'حليب', 'سكر', 'خميرة', 'بيض', 'زبدة', 'زيت للقلي'], instructions: ['نخلط الخميرة والحليب والسكر.', 'نضيف باقي المكونات ونعجن.', 'نترك العجينة لتتخمر ثم نشكلها.', 'نقليها في الزيت الساخن.'] },
+            { id: 25, name: 'كريم كراميل', price: 9, prepTime: '45 دقيقة', ingredients: ['بيض', 'سكر', 'حليب', 'فانيلا'], instructions: ['نذوب السكر ونضعه في قوالب الكراميل.', 'نخلط البيض والحليب والفانيلا.', 'نسكب الخليط فوق الكراميل.', 'نخبزها في حمام مائي.'] },
+            { id: 26, name: 'أم علي بالفستق', price: 10, prepTime: '30 دقيقة', ingredients: ['عجينة باف باستري', 'حليب', 'فستق حلبي', 'سكر', 'قشطة'], instructions: ['نخبز عجينة الباف باستري.', 'نخلط الحليب والسكر والقشطة.', 'نخلط الباف باستري مع الفستق ونسكب الخليط فوقه.', 'نخبزها حتى تحمر.'] },
+            { id: 27, name: 'كيكة قدرة قادر', price: 17, prepTime: 'ساعة', ingredients: ['سكر', 'بيض', 'حليب سائل', 'فانيلا', 'طحين', 'كاكاو', 'زيت'], instructions: ['نحضر الكراميل ونسكبه في القالب.', 'نحضر خليط الكريم كراميل ونضعه فوقه.', 'نحضر خليط الكيك ونضعه فوقهما.', 'نخبزها في حمام مائي.'] },
+            { id: 28, name: 'تشيز كيك بارد', price: 20, prepTime: 'ساعتان', ingredients: ['بسكويت', 'زبدة', 'جبنة كريمية', 'كريمة خفق', 'جيلاتين', 'سكر بودرة'], instructions: ['نطحن البسكويت ونخلطه بالزبدة ونرصه في قالب.', 'نخفق الجبنة والكريمة والسكر.', 'نضيف الجيلاتين المذاب ونخلط.', 'نسكب الخليط فوق البسكويت ونبرده.'] },
+            { id: 29, name: 'كيكة الزبادي', price: 11, prepTime: '40 دقيقة', ingredients: ['زبادي', 'بيض', 'سكر', 'زيت', 'طحين', 'بيكنج بودر', 'فانيلا'], instructions: ['نخفق البيض والسكر والفانيلا.', 'نضيف الزبادي والزيت.', 'نضيف المكونات الجافة بالتدريج ونخبزها.'] },
+            { id: 30, name: 'حلوى السميد', price: 8, prepTime: '25 دقيقة', ingredients: ['سميد', 'سكر', 'ماء', 'حليب بودرة', 'زبدة', 'جوز هند'], instructions: ['نحمص السميد في الزبدة.', 'نخلط السكر والماء والحليب.', 'نضيف الخليط على السميد ونحرك حتى يتجانس.', 'نسكبه في طبق ونزينه بجوز الهند.'] },
+        ];
+
+        let selectedRecipe = null;
+        let userRecipes = [];
+        let view = 'recipesList';
+
+        // وظائف إدارة العرض
+        function setView(newView, recipe = null) {
+            view = newView;
+            selectedRecipe = recipe;
+            renderApp();
+        }
+
+        // وظائف النوافذ المنبثقة
+        function showModal(contentHtml) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50';
+            modal.innerHTML = contentHtml;
+            document.body.appendChild(modal);
+            return modal;
+        }
+
+        function showConfirmationModal() {
+            const content = `
+                <div dir="rtl" class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center">
+                    <svg class="mx-auto h-16 w-16 text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">تم استلام طلبك بنجاح!</h3>
+                    <p class="text-gray-600 mb-4">سيتم تجهيز المكونات وإرسالها إليك. شكراً لثقتك بنا.</p>
+                    <button id="close-confirmation-modal" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300">
+                        العودة للقائمة الرئيسية
+                    </button>
+                </div>
+            `;
+            const modal = showModal(content);
+            modal.querySelector('#close-confirmation-modal').onclick = () => {
+                document.body.removeChild(modal);
+                setView('recipesList');
+            };
+        }
+
+        function showErrorModal(message) {
+            const content = `
+                <div dir="rtl" class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center">
+                    <svg class="mx-auto h-16 w-16 text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold text-red-600 mb-2">خطأ!</h3>
+                    <p class="text-gray-600 mb-4">${message}</p>
+                    <button id="close-error-modal" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300">
+                        إغلاق
+                    </button>
+                </div>
+            `;
+            const modal = showModal(content);
+            modal.querySelector('#close-error-modal').onclick = () => {
+                document.body.removeChild(modal);
+            };
+        }
+
+        function showAddRecipeModal() {
+            const content = `
+                <div dir="rtl" class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 max-w-lg w-full">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">أضف وصفتك الخاصة</h2>
+                    <form id="add-recipe-form" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-1" for="recipeName">اسم الوصفة</label>
+                            <input type="text" id="recipeName" name="recipeName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required />
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-1" for="ingredients">المكونات (افصل بينها بفاصلة)</label>
+                            <textarea id="ingredients" name="ingredients" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-1" for="instructions">طريقة التحضير (كل خطوة في سطر)</label>
+                            <textarea id="instructions" name="instructions" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-4 rtl:space-x-reverse">
+                            <button type="button" id="cancel-add-recipe" class="px-6 py-2 bg-gray-400 text-white font-semibold rounded-full hover:bg-gray-500 transition-colors duration-300">
+                                إلغاء
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-green-600 text-white font-bold rounded-full hover:bg-green-700 transition-colors duration-300">
+                                حفظ الوصفة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            const modal = showModal(content);
+            
+            modal.querySelector('#cancel-add-recipe').onclick = () => {
+                document.body.removeChild(modal);
+            };
+
+            modal.querySelector('#add-recipe-form').onsubmit = (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const name = form.recipeName.value;
+                const ingredients = form.ingredients.value;
+                const instructions = form.instructions.value;
+
+                if (!name || !ingredients || !instructions) {
+                    showErrorModal('يرجى ملء جميع الحقول!');
+                    return;
+                }
+
+                const newRecipeObject = {
+                    id: Date.now(),
+                    name: name,
+                    price: 0,
+                    prepTime: 'غير محدد',
+                    ingredients: ingredients.split(',').map(item => item.trim()),
+                    instructions: instructions.split('\n').map(step => step.trim()).filter(step => step),
+                    isUserRecipe: true,
+                };
+
+                userRecipes.unshift(newRecipeObject);
+                document.body.removeChild(modal);
+                renderApp();
+            };
+        }
+
+        // وظيفة العرض الرئيسية
+        function renderApp() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = ''; // مسح المحتوى الحالي
+
+            let contentHtml = '';
+
+            switch (view) {
+                case 'recipesList':
+                    contentHtml = `
+                        <div dir="rtl" class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+                            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-8 sm:mb-10">وصفات حلويات</h1>
+                            <div class="flex justify-center mb-6">
+                                <button id="my-recipes-btn" class="px-6 py-3 bg-indigo-600 text-white font-bold rounded-full hover:bg-indigo-700 transition-colors duration-300 shadow-lg">
+                                    وصفاتي
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                                ${recipesData.map(recipe => `
+                                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 p-4 sm:p-6 text-center flex flex-col justify-between">
+                                        <div>
+                                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">${recipe.name}</h2>
+                                            <p class="mt-2 text-gray-500 font-medium">${recipe.prepTime}</p>
+                                        </div>
+                                        <div class="mt-4 flex justify-center space-x-2 rtl:space-x-reverse">
+                                            <button data-recipe-id="${recipe.id}" class="details-btn px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md flex-1">
+                                                التفاصيل
+                                            </button>
+                                            <button data-recipe-id="${recipe.id}" class="checkout-btn px-4 py-2 bg-green-600 text-white font-bold rounded-full hover:bg-green-700 transition-colors duration-300 shadow-md flex-1">
+                                                اطلب
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'recipeDetails':
+                    const recipe = selectedRecipe;
+                    contentHtml = `
+                        <div dir="rtl" class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+                            <button id="back-btn" class="mb-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                                الرجوع
+                            </button>
+                            <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-10">
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 text-center">${recipe.name}</h1>
+                                <p class="text-center text-gray-600 mb-6 font-medium text-lg">مدة التحضير: <span class="text-gray-800 font-bold">${recipe.prepTime}</span></p>
+                                <div class="flex flex-col mb-6">
+                                    <div class="w-full">
+                                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3">المكونات</h2>
+                                        <ul class="list-disc list-inside space-y-2 text-gray-700 text-lg">
+                                            ${recipe.ingredients.map(item => `<li>${item}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="mt-6 border-t border-gray-200 pt-6">
+                                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3">طريقة التحضير</h2>
+                                    <ol class="list-decimal list-inside space-y-3 text-gray-700 text-lg leading-relaxed">
+                                        ${recipe.instructions.map(step => `<li>${step}</li>`).join('')}
+                                    </ol>
+                                </div>
+                                <div class="flex justify-center mt-8">
+                                    <button id="details-checkout-btn" class="px-6 py-3 bg-green-600 text-white font-bold rounded-full text-lg hover:bg-green-700 transition-colors duration-300 shadow-lg">
+                                        اطلب المكونات
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'checkout':
+                    contentHtml = `
+                        <div dir="rtl" class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+                            <button id="checkout-back-btn" class="mb-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                                الرجوع
+                            </button>
+                            <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-10 max-w-3xl mx-auto">
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 text-center">طلب مكونات <span class="text-green-600">${selectedRecipe.name}</span></h1>
+                                
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 mt-6">ملخص الطلب</h2>
+                                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 border-b border-gray-200 pb-4">
+                                    <p class="text-gray-700 text-lg font-medium">إجمالي التكلفة:</p>
+                                    <p class="text-2xl font-extrabold text-green-600 mt-2 sm:mt-0">${selectedRecipe.price} شيكل</p>
+                                </div>
+
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4">المكونات المطلوبة</h2>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700 text-lg mb-8">
+                                    ${selectedRecipe.ingredients.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                                
+                                <form id="checkout-form">
+                                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4">معلومات الشحن</h2>
+                                    <div class="space-y-4 mb-8">
+                                        <div>
+                                            <label class="block text-gray-700 font-semibold mb-1" for="fullName">الاسم الكامل</label>
+                                            <input type="text" id="fullName" name="fullName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required />
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 font-semibold mb-1" for="email">البريد الإلكتروني</label>
+                                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required />
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 font-semibold mb-1" for="phone">رقم الهاتف</label>
+                                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required />
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 font-semibold mb-1" for="address">العنوان الكامل</label>
+                                            <textarea id="address" name="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4">طريقة الدفع</h2>
+                                    <div class="space-y-4 mb-8">
+                                        <div class="flex items-center">
+                                            <input type="radio" id="cash" name="paymentMethod" value="cash" class="form-radio h-5 w-5 text-green-600 rounded-full focus:ring-2 focus:ring-green-500" required />
+                                            <label for="cash" class="ml-3 rtl:mr-3 text-gray-700 text-lg">الدفع عند الاستلام</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" id="creditCard" name="paymentMethod" value="creditCard" class="form-radio h-5 w-5 text-green-600 rounded-full focus:ring-2 focus:ring-green-500" required disabled />
+                                            <label for="creditCard" class="ml-3 rtl:mr-3 text-gray-700 text-lg">البطاقة الائتمانية (غير فعال)</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-center">
+                                        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-green-600 text-white font-bold rounded-full text-lg hover:bg-green-700 transition-colors duration-300 shadow-lg">
+                                            تأكيد الطلب
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'myRecipes':
+                    contentHtml = `
+                        <div dir="rtl" class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+                            <button id="my-recipes-back-btn" class="mb-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                                الرجوع
+                            </button>
+                            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-8 sm:mb-10">وصفاتي</h1>
+                            <div class="flex justify-center mb-6">
+                                <button id="add-recipe-btn" class="px-6 py-3 bg-green-600 text-white font-bold rounded-full hover:bg-green-700 transition-colors duration-300 shadow-lg">
+                                    + أضف وصفة جديدة
+                                </button>
+                            </div>
+                            ${userRecipes.length > 0 ? `
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                                    ${userRecipes.map(recipe => `
+                                        <div data-recipe-id="${recipe.id}" class="user-recipe-card bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer p-4 sm:p-6 text-center">
+                                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">${recipe.name}</h2>
+                                            <p class="mt-2 text-gray-500 font-medium">مدة التحضير: ${recipe.prepTime}</p>
+                                            <p class="mt-2 text-gray-500 font-medium">وصفتك الخاصة</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <p class="text-center text-gray-600 text-lg mt-12">لم تقم بإضافة أي وصفات بعد. ابدأ بإضافة وصفتك الأولى!</p>
+                            `}
+                        </div>
+                    `;
+                    break;
+            }
+
+            appDiv.innerHTML = contentHtml;
+            attachEventListeners();
+        }
+
+        // إرفاق مستمعي الأحداث
+        function attachEventListeners() {
+            if (view === 'recipesList') {
+                document.getElementById('my-recipes-btn').addEventListener('click', () => setView('myRecipes'));
+                document.querySelectorAll('.details-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.dataset.recipeId);
+                        const recipe = recipesData.find(r => r.id === id);
+                        setView('recipeDetails', recipe);
+                    });
+                });
+                document.querySelectorAll('.checkout-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.dataset.recipeId);
+                        const recipe = recipesData.find(r => r.id === id);
+                        setView('checkout', recipe);
+                    });
+                });
+            } else if (view === 'recipeDetails') {
+                document.getElementById('back-btn').addEventListener('click', () => {
+                    if (selectedRecipe.isUserRecipe) {
+                        setView('myRecipes');
+                    } else {
+                        setView('recipesList');
+                    }
+                });
+                document.getElementById('details-checkout-btn').addEventListener('click', () => {
+                    setView('checkout', selectedRecipe);
+                });
+            } else if (view === 'checkout') {
+                document.getElementById('checkout-back-btn').addEventListener('click', () => setView('recipeDetails', selectedRecipe));
+                document.getElementById('checkout-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // يمكنك معالجة البيانات هنا
+                    showConfirmationModal();
+                });
+            } else if (view === 'myRecipes') {
+                document.getElementById('my-recipes-back-btn').addEventListener('click', () => setView('recipesList'));
+                document.getElementById('add-recipe-btn').addEventListener('click', showAddRecipeModal);
+                document.querySelectorAll('.user-recipe-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const id = parseInt(e.currentTarget.dataset.recipeId);
+                        const recipe = userRecipes.find(r => r.id === id);
+                        setView('recipeDetails', recipe);
+                    });
+                });
+            }
+        }
+
+        // بدء التطبيق عند تحميل الصفحة
+        window.onload = renderApp;
+    </script>
+</body>
+</html>
